@@ -38,15 +38,19 @@ app.post('/api/notes', (req, res) => {
 
 app.delete('/api/notes/:id', (req, res) => {
     const noteIndex = noteData.findIndex((note) => note.id === req.params.id);
-    const tmpNote = noteData[noteIndex];
-    noteData.splice(noteIndex, 1);
-    fs.writeFile(path.join(__dirname, 'db/db.json'), JSON.stringify(noteData, null, 2), (err) => {
-        if (err) {
-            res.status(500).json({ error: 'Error saving JSON data to file.' });
-        } else {
-            res.json(tmpNote);
-        }
-    });
+    if (noteIndex >= 0) {
+        const tmpNote = noteData[noteIndex];
+        noteData.splice(noteIndex, 1);
+        fs.writeFile(path.join(__dirname, 'db/db.json'), JSON.stringify(noteData, null, 2), (err) => {
+            if (err) {
+                res.status(500).json({ error: 'Error saving JSON data to file.' });
+            } else {
+                res.json(tmpNote);
+            }
+        });
+    } else {
+        res.status(500).json(({ error: 'Error finding provided ID.' }));
+    }
 });
 
 app.listen(PORT, () =>

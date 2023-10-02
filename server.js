@@ -24,16 +24,20 @@ app.get('/api/notes', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
     const { title, text } = req.body;
-    const tmpNote = { id: uuidv4(), title, text }
-    tmpNote.id = uuidv4();
-    noteData.push(tmpNote);
-    fs.writeFile(path.join(__dirname, 'db/db.json'), JSON.stringify(noteData, null, 2), (err) => {
-        if (err) {
-            res.status(500).json({ error: 'Error saving JSON data to file.' });
-        } else {
-            res.json(tmpNote);
-        }
-    });
+    if (title && title !== '' && text && text !== '') {
+        const tmpNote = { id: uuidv4(), title, text }
+        tmpNote.id = uuidv4();
+        noteData.push(tmpNote);
+        fs.writeFile(path.join(__dirname, 'db/db.json'), JSON.stringify(noteData, null, 2), (err) => {
+            if (err) {
+                res.status(500).json({ error: 'Error saving JSON data to file.' });
+            } else {
+                res.json(tmpNote);
+            }
+        });
+    } else {
+        res.status(500).json({ error: 'Error title and text must be provided.' });
+    }
 });
 
 app.delete('/api/notes/:id', (req, res) => {
